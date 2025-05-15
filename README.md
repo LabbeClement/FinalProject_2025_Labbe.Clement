@@ -1,106 +1,154 @@
-# RecoSys Project
+# Video Recommendation System
 
-## Pour dl la premiere base
+This repository contains a video recommendation system built using content-based filtering methods. The project uses a dataset of user interactions with short-form videos to develop personalized content recommendations.
 
-```bash
-wget --no-check-certificate 'https://drive.usercontent.google.com/download?id=1qe5hOSBxzIuxBb1G_Ih5X-O65QElollE&export=download&confirm=t&uuid=b2002093-cc6e-4bd5-be47-9603f0b33470' -O KuaiRec.zip
+## Table of Contents
+1. [Overview](#overview)
+2. [Dataset](#dataset)
+3. [Methodology](#methodology)
+4. [Feature Engineering](#feature-engineering)
+5. [Model Development](#model-development)
+6. [Evaluation](#evaluation)
+7. [Results](#results)
+8. [Conclusions](#conclusions)
 
-unzip KuaiRec.zip -d data_final_project
-```
+## Overview
 
-# Project Assignment: Short Video Recommender System (KuaiRec)
-
-## Objective
-
-Develop a recommender system that suggests short videos to users based on user preferences, interaction histories, and video content using the **KuaiRec dataset**. The challenge is to create a personalised and scalable recommendation engine similar to those used in platforms like TikTok or Kuaishou.
+This project implements a content-based video recommendation system that analyzes user behavior and video characteristics to provide personalized recommendations. The system focuses on recommending videos that match users' preferences based on their past viewing behavior.
 
 ## Dataset
 
-We will use the **KuaiRec dataset**, a large-scale, fully-observed dataset collected from the Kuaishou short-video platform.
+The dataset used in this project is the KuaiRec 2.0, which contains:
 
-It contains:
+- User-video interactions (watch time, engagement metrics)
+- Video metadata (categories, duration, etc.)
+- Engagement metrics (likes, comments, shares)
+- Temporal data (timestamps of interactions)
 
-- **User interactions** (views, likes, etc.)
-- **Video metadata** (video ID, tags, etc.)
-- **Timestamps**
+Key dataset statistics:
+- 4,269,399 user-video interactions
+- 1,411 unique users
+- 3,327 unique videos
+- 31 different content categories
 
-More info: [KuaiRec Paper](https://arxiv.org/abs/2202.10842)
+The dataset provides rich engagement metrics including:
+- Watch ratio (play_duration / video_duration)
+- Total likes, comments, and shares
+- Average play progress
+- User category preferences
 
-The dataset will be preprocessed and provided in this format:
+## Methodology
 
-- `interactions_train.csv`: historical user-item interactions for training.
-- `interactions_test.csv`: user-item pairs to score during testing.
-- `sample_submission.csv`: a template showing the expected output format.
-- `video_metadata.csv`: metadata including tags or content-related features.
+The project follows a systematic approach to building a recommendation system:
 
-### Download the dataset
+1. **Data Loading and Preprocessing**:
+   - Loading multiple dataset files
+   - Handling missing values and inconsistencies
+   - Filtering out extreme values in watch ratios (below 5th and above 99.99th percentile)
+   - Converting categorical data into appropriate numeric representations
 
-You can download the dataset via a wget command:
+2. **Exploratory Data Analysis**:
+   - Understanding user behavior patterns
+   - Analyzing video popularity metrics
+   - Identifying category preferences
 
-```bash
-wget https://nas.chongminggao.top:4430/datasets/KuaiRec.zip --no-check-certificate
-unzip KuaiRec.zip
-```
+3. **Feature Engineering**:
+   - Creating user profiles based on category preferences and engagement patterns
+   - Developing video features based on popularity and engagement metrics
+   - Generating interaction features between users and videos
 
-### Dataset description
+4. **Model Development**:
+   - Building a content-based recommendation system using similarity-based techniques
+   - Implementing a recommendation algorithm that can generate personalized video suggestions
 
-KuaiRec contains millions of user-item interactions as well as side information including the item categories and a social network. Six files are included in the download data:
+5. **Evaluation**:
+   - Training-test split (80/20) for evaluation
+   - Implementing evaluation metrics: Precision@k, Recall@k, and Mean Average Precision (MAP)
+   - Testing with different values of k to understand performance across recommendation list sizes
 
-```bash
-KuaiRec
-  ├── data
-  │   ├── big_matrix.csv          
-  │   ├── small_matrix.csv
-  │   ├── social_network.csv
-  │   ├── user_features.csv
-  │   ├── item_daily_features.csv
-  │   └── item_categories.csv
-  │   └── kuairec_caption_category.csv
-```
+## Feature Engineering
 
-## Tasks
+### User Features
+- **Engagement statistics**: video_count, avg_watch_ratio, total_play_time, complete_views, avg_play_progress
+- **Category preferences**: Distribution of watched videos across 31 content categories
+- **Temporal patterns**: morning_ratio, afternoon_ratio, evening_ratio, night_ratio, weekend_ratio
 
-1. **Data Preprocessing**
-   - Load and inspect the dataset.
-   - Handle missing or inconsistent data.
-   - Merge metadata for content-based models if necessary.
+### Video Features
+- **Popularity metrics**: view_count, like_engagement, comment_engagement, share_engagement, daily_popularity
+- **Engagement quality**: avg_watch_ratio, complete_view_ratio
+- **Normalized metrics**: All popularity features were normalized using MinMaxScaler to prevent dominance of certain metrics
 
-2. **Feature Engineering**
-   - Create meaningful features from interaction and metadata (e.g., content tags, user activity history).
-   - Build user-item interaction matrix.
-   - Optionally extract time-based or popularity-based features.
+### Interaction Features
+- **User-Video affinity**: Ratio of a user's watch ratio for a video to their average watch ratio
+- **Category-based matching**: Alignment between user category preferences and video categories
 
-3. **Model Development**
-   - Choose a recommendation approach:
-     - Collaborative filtering (e.g., ALS, Matrix Factorisation)
-     - Content-based filtering
-     - Sequence-aware models
-     - Hybrid approaches
-   - Train and validate your model on the training set.
+## Model Development
 
-4. **Recommendation Algorithm**
-   - Predict which videos are likely to be enjoyed by each user in the test set.
-   - Generate a top-N ranked list of recommendations for each user.
+The implementation uses a content-based filtering approach that:
 
-5. **Evaluation**
-   - Choose suitable metrics (e.g., Precision@K, Recall@K, MAP, NDCG).
-   - Evaluate performance and provide interpretations.
+1. **Creates a video similarity matrix** using cosine similarity between video feature vectors
+2. **Identifies user preferences** by analyzing videos with high watch ratios (>0.7)
+3. **Generates recommendations** by finding videos similar to those the user has previously enjoyed
+4. **Filters recommendations** by removing videos the user has already watched
 
-**Important note**: This project leaves room for creativity. Different students might take different paths in preprocessing, modelling, and evaluation. What matters is your ability to justify each step with solid reasoning.
+The content-based recommender class has these key components:
+- Video feature representation
+- Video similarity computation
+- User preference extraction
+- Recommendation generation logic
 
-## Deliverables
+## Evaluation
 
-I expect you to send me an email with a link to your GitHub repo. If the repo is private, please add me as a collaborator.
+The evaluation framework uses:
 
-- **Code**: Well-documented code in a GitHub repository. Submit a *link* to the repo.
-- **Report**: A detailed README.md explaining the methodology, experiments, results, and conclusions.
+- **Training-Test Split**: 80% of interactions for training, 20% for testing
+- **Relevant Items Definition**: Videos with watch ratio > 0.7 in the test set are considered relevant
+- **Metrics**:
+  - Precision@k: Proportion of recommended items that are relevant
+  - Recall@k: Proportion of relevant items that are recommended
+  - Mean Average Precision (MAP): Average precision across different recall levels
 
-**Important Note**: Please name your repo as `FinalProject_2025_<your_name>`. Not your GitHub username, or your nickname, use your real name, otherwise it will be hard for me to find your repo.
+Tests were conducted with varying values of k (5, 7, 10, 12, 15, 17, 20) to understand how performance changes with different recommendation list sizes.
 
-## Evaluation Criteria
+## Results
 
-- **Functionality**: Does your recommender provide high-quality and relevant video suggestions?
-- **Accuracy**: Did you choose meaningful metrics? How well does the model perform according to them?
-- **Documentation**: Clear, organised code and explanations of each design choice.
+The results show consistent performance across different values of k:
 
-This final project is designed to mimic real-world recommender system challenges. It’s your chance to build something scalable and practical. Good luck! 🚀
+| k  | Precision@k | Recall@k | MAP     |
+|----|-------------|----------|---------|
+| 5  | 0.6080      | 0.0086   | 0.0070  |
+| 7  | 0.6143      | 0.0123   | 0.0095  |
+| 10 | 0.6020      | 0.0172   | 0.0129  |
+| 12 | 0.6025      | 0.0207   | 0.0152  |
+| 15 | 0.6067      | 0.0260   | 0.0186  |
+| 17 | 0.6135      | 0.0298   | 0.0211  |
+| 20 | 0.6050      | 0.0346   | 0.0243  |
+
+Key observations:
+- **Precision remains stable** (around 60-61%) across different k values
+- **Recall increases** with larger k values, as expected
+- **MAP (Mean Average Precision)** also increases with k, showing that larger recommendation lists generally provide better coverage of relevant items
+
+The model demonstrates good precision, indicating that most recommended videos are relevant to the user's interests. The increasing recall with larger k values shows that we can capture more of the user's preferred videos by increasing the recommendation list size.
+
+## Conclusions
+
+The content-based recommendation system developed in this project demonstrates several strengths:
+
+1. **Consistent Precision**: The system maintains high precision (~60%) across different recommendation list sizes, indicating it reliably recommends relevant content.
+
+2. **Personalization Capability**: By leveraging user viewing history and content features, the system can provide personalized recommendations without requiring collaborative data.
+
+3. **Scalability**: The approach can handle new videos without suffering from the cold-start problem often seen in collaborative filtering methods.
+
+Potential improvements for future work:
+
+1. **Hybrid Approach**: Combining content-based filtering with collaborative filtering could improve recommendation quality.
+
+2. **Temporal Dynamics**: Incorporating temporal patterns in user behavior could enhance the model's ability to adapt to changing preferences.
+
+3. **Deep Learning Methods**: Using deep neural networks for feature extraction and similarity computation could capture more complex patterns in the data.
+
+4. **Diversity Enhancement**: Adding mechanisms to ensure diversity in recommendations while maintaining relevance.
+
+Overall, this content-based recommendation system provides a solid foundation for personalized video recommendations that can be further enhanced with additional techniques and features.
