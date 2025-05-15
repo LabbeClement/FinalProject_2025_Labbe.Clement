@@ -1,0 +1,6 @@
+*.zip
+data_final_project/*
+**.joblib
+**.csv
+**.pkl
+**.npz
