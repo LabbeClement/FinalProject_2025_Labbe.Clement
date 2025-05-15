@@ -25,6 +25,22 @@ The dataset used in this project is the KuaiRec 2.0, which contains:
 - Engagement metrics (likes, comments, shares)
 - Temporal data (timestamps of interactions)
 
+### Getting the Dataset
+
+To download the dataset:
+1. Download the dataset from this URL: [KuaiRec 2.0 Dataset](https://drive.usercontent.google.com/download?id=1qe5hOSBxzIuxBb1G_Ih5X-O65QElollE&export=download&confirm=t&uuid=b2002093-cc6e-4bd5-be47-9603f0b33470)
+2. Create a folder named `data_final_project`
+3. Extract the downloaded zip file into this folder:
+   ```
+   mkdir data_final_project
+   mv KuaiRec.zip data_final_project/
+   cd data_final_project
+   unzip KuaiRec.zip
+   ```
+4. The dataset files will be available in the `data_final_project/KuaiRec 2.0/data/` directory
+
+### Dataset Statistics
+
 Key dataset statistics:
 - 4,269,399 user-video interactions
 - 1,411 unique users
